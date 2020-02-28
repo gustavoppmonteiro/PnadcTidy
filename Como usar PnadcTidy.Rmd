@@ -3,7 +3,19 @@ title: "Como usar PnadcTidy"
 output: html_document
 ---
 
-# 1. Baixar os dados da PnadC
+# Estrutura
+
+1. Baixar os dados da PnadC
+2. Abrindo o RStudio
+3. Instalando e carregando os pacotes necessários
+4. Instalabdo o `PnadcTidy`
+5. Lendo a Pnad com o `PnadcTidy`
+
+
+***
+
+
+## 1. Baixar os dados da PnadC
 
 
 A primeira coisa a ser feita para usar o comando `PnadcTidy` é baixar os arquivos com os microdados da PnadC e com o Input para o SAS.
@@ -31,7 +43,7 @@ Para utilizar os dados da __PnadC trimestral do 4º trimestre de 2019__, é nece
 ***
 
 
-# 2. Abrindo o RStudio
+## 2. Abrindo o RStudio
 
 
 Depois de baixar e descompactar os arquivos, abra o RStudio e execute alguns comandos iniciais para limpar a memória e definir a pasta de trabalho do R.
@@ -62,7 +74,7 @@ setwd("C:/Users/gustavo/Desktop/curso R para jornalistas/uDados/")
 
 
 
-# 3. Instalando e carregando os pacotes necessários
+## 3. Instalando e carregando os pacotes necessários
 
 
 Para usar o comando `PnadTidy` e manipular os dados da PnadC, vamos usar algumas funções que fazem parte de pacotes que não vêm com o R básico.
@@ -114,13 +126,13 @@ library(devtools) # pacote utilizado para baixar o PnadcTidy
 
 
 
-# 4. Instalabdo o `PnadcTidy`
+## 4. Instalabdo o `PnadcTidy`
 
 
 O pacote `PnadcTidy` está em um repositório do Github. Para instalá-lo e carregá-lo, execute as linhas de comando abaixo:
 
 
-```{r, echo=T, message=FALSE}
+```{r, echo=T, message=FALSE, warning=FALSE}
 
 devtools::install_github("gustavoppmonteiro/PnadcTidy")
 library(PnadcTidy)
@@ -134,7 +146,7 @@ library(PnadcTidy)
 
 
 
-# 5. Lendo a Pnad
+## 5. Lendo a Pnad com o `PnadcTidy`
 
 
 O comando `PnadcTidy` é composto por três argumentos, tendo a seguinte forma:
