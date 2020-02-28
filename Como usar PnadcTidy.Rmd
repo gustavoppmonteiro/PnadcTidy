@@ -1,0 +1,209 @@
+---
+title: "Como usar PnadcTidy"
+output: html_document
+---
+
+# 1. Baixar os dados da PnadC
+
+
+A primeira coisa a ser feita para usar o comando `PnadcTidy` é baixar os arquivos com os microdados da PnadC e com o Input para o SAS.
+
+O IBGE disponibiliza uma pasta com todos os dados da Pnad Contínua. Ela se encontra no endereço: <ftp://ftp.ibge.gov.br/Trabalho_e_Rendimento/Pesquisa_Nacional_por_Amostra_de_Domicilios_continua/>.
+
+
+
+***
+
+
+### Exemplo: baixando os dados do 4º trimestre de 2019
+Para utilizar os dados da __PnadC trimestral do 4º trimestre de 2019__, é necessário:
+
+1. Baixar o arquivo "PNADC_042019.zip", na pasta: <ftp://ftp.ibge.gov.br/Trabalho_e_Rendimento/Pesquisa_Nacional_por_Amostra_de_Domicilios_continua/Trimestral/Microdados/2019/>.
+
+2. Baixar o arquivo "Dicionario_e_input.zip", na pasta: <ftp://ftp.ibge.gov.br/Trabalho_e_Rendimento/Pesquisa_Nacional_por_Amostra_de_Domicilios_continua/Trimestral/Microdados/Documentacao/>.
+
+3. A seguir, é preciso descompactar os dois arquivos. Para utilizar o comando PnadcTidy, serão necessários os seguintes arquivos descompactados:
+- "Input_PNADC_trimestral.txt" e,
+- "PNADC_042019.txt".
+
+
+
+***
+
+
+# 2. Abrindo o RStudio
+
+
+Depois de baixar e descompactar os arquivos, abra o RStudio e execute alguns comandos iniciais para limpar a memória e definir a pasta de trabalho do R.
+
+```{r, echo=T,  message=FALSE}
+
+rm(list=ls())   # Limpa objetos no Environment
+cat("\014")     # Limpa o console
+
+
+# O comando abaixo mostra qual é a pasta de trabalho do R.
+# Ou seja, em qual pasta o R vai ler e salvar os arquivos
+
+getwd()
+
+
+# Informe ao R qual vai ser sua pasta de trabalho - quer dizer, em qual pasta estão os arquivos baixados da PnadC. Eu vou alterar para a pasta uDados.
+setwd("C:/Users/gustavo/Desktop/curso R para jornalistas/uDados/")
+
+
+```
+
+**Repare que, para definir o caminho da pasta, deve-se usar as barras invertidas:**
+
+`"/"`
+
+- *Exceção: sistema iOS*.
+
+
+
+# 3. Instalando e carregando os pacotes necessários
+
+
+Para usar o comando `PnadTidy` e manipular os dados da PnadC, vamos usar algumas funções que fazem parte de pacotes que não vêm com o R básico.
+
+Pacotes são 
+
+> "conjuntos de extras de funções que podem ser instalados além do R base" (IBDAP, p. 15).
+
+
+Para instalar os pacotes que precisamos, basta executar os comandos abaixo:
+
+
+`install.packages("nome do pacote")`
+
+
+Vamos instalar um conjunto de pacotes:
+
+
+
+`install.packages("readr")`
+
+`install.packages("dplyr")`
+
+`install.packages("questionr")`
+
+`install.packages("PNADcIBGE")`
+
+`install.packages("survey")`
+
+`install.packages("devtools")`
+
+
+
+
+Depois de instalados, os pacotes ficam disponíveis na biblioteca para serem usados e não precisam ser instalados novamente em cada uso. No entanto, é preciso carregar os pacotes que serão utilizados toda vez que um novo código for escrito.  
+
+```{r, echo=T,  message=FALSE}
+
+library(readr) # pacote para leitura de dados
+library(dplyr) # pacote para manusear os dados
+library(questionr) # pacote para gerar tabelas com peso amostral
+library(PNADcIBGE) # pacote para baixar e ler a Pnad e definir desenho amostral
+library(survey) # pacote utilizado na definição do desenho amostral
+library(devtools) # pacote utilizado para baixar o PnadcTidy
+
+```
+
+
+
+
+
+# 4. Instalabdo o `PnadcTidy`
+
+
+O pacote `PnadcTidy` está em um repositório do Github. Para instalá-lo e carregá-lo, execute as linhas de comando abaixo:
+
+
+```{r, echo=T, message=FALSE}
+
+devtools::install_github("gustavoppmonteiro/PnadcTidy")
+library(PnadcTidy)
+
+```
+
+
+
+**É importante lembrar que, na hora da instalação, o nome do pacote deve aparecer entre aspas.** Mas isso não é necessário ao executar o comando library, que carrega o pacote.
+
+
+
+
+# 5. Lendo a Pnad
+
+
+O comando `PnadcTidy` é composto por três argumentos, tendo a seguinte forma:
+
+`PnadcTidy(inputSAS, arquivoPnad, variaveis)`
+
+
+Os argumentos são:
+
+
+* *inputSAS*: usado para especificar o nome do arquivo Input do SAS (deve terminar em ".txt").
+
+* *arquivoPnad*: usado para especificar o nome do arquivo de microdados da PnadC (deve terminar em ".txt").
+
+* *variaveis*: usado para selecionar as variáveis da PnadC que serão mantidas na base.
+        
+       
+
+
+***
+
+### Exemplo: lendo os dados do 4º trimestre de 2019
+
+
+Neste exemplo, vamos ler os dados salvos na pasta de trabalho do R, referentes à Pnad trimestral do 4º trimestre de 2019. Vamos guardar esses dados em um objeto chamado "Pnad4T2019".
+
+
+Além disso, vamos manter apenas algumas variáveis do banco, com o objetivo de poupar espaço na memória e reduzir o tempo de processamento.
+
+Vamos manter as seguintes variáveis:
+
+* VD4009: Posição na ocupação 
+* V2009: idade
+* V2007: sexo
+* UF
+* VD4016: rendimento habitual do trabalho principal
+* VD4002: Condição na ocupação
+
+
+
+```{r, echo=T, message=FALSE, warning=FALSE}
+
+Pnad4T2019 <- PnadcTidy(inputSAS="Input_PNADC_trimestral.txt", 
+                       arquivoPnad="PNADC_042019.txt", 
+                       variaveis=c("VD4009", "V2009", "V2007" ,"UF", "VD4016", "VD4002"))
+
+
+head(Pnad4T2019) # visualizar as primeiras 6 linhas do banco
+
+
+```
+
+
+Note que o banco resultante tem *542.802* linhas (ou, observações/entrevistados) e *12* colunas (ou, variáveis):
+
+```{r, echo=T, message=FALSE, warning=FALSE}
+
+dim(Pnad4T2019) # vê as dimensões do banco estruturado
+
+```
+
+
+***
+
+
+**Pronto!**
+
+
+Os dados da Pnad estão prontos para serem manuseados, em um banco de dados estruturado.
+
+
+***
