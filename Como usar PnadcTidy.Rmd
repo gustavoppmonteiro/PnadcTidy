@@ -159,7 +159,7 @@ Os argumentos são:
 ### Exemplo: lendo os dados do 4º trimestre de 2019
 
 
-Neste exemplo, vamos ler os dados salvos na pasta de trabalho do R, referentes à Pnad trimestral do 4º trimestre de 2019. Vamos guardar esses dados em um objeto chamado "Pnad4T2019".
+Neste exemplo, vamos ler os dados salvos na pasta de trabalho do R, referentes à Pnad trimestral do **4º trimestre de 2019**. Vamos guardar esses dados em um objeto chamado "Pnad4T2019".
 
 
 Além disso, vamos manter apenas algumas variáveis do banco, com o objetivo de poupar espaço na memória e reduzir o tempo de processamento.
