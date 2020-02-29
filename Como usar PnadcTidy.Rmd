@@ -1,16 +1,24 @@
 ---
 title: "Como usar PnadcTidy"
+author: "Gustavo Monteiro"
+date: "28/02/2020"
 output: html_document
 ---
 
-# Estrutura
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(echo = FALSE)
+knitr::opts_knit$set(root.dir = "C:/Users/gustavo/Desktop/curso R para jornalistas/uDados/") 
+```
+
+
+## Estrutura
 
 1. Baixar os dados da PnadC
 2. Abrindo o RStudio
-3. Instalando e carregando os pacotes necessários
-4. Instalabdo o `PnadcTidy`
+3. Instalando e carregando pacotes
+4. Instalando o `PnadcTidy`
 5. Lendo a Pnad com o `PnadcTidy`
-
 
 ***
 
@@ -27,7 +35,7 @@ O IBGE disponibiliza uma pasta com todos os dados da Pnad Contínua. Ela se enco
 ***
 
 
-### Exemplo: baixando os dados do 4º trimestre de 2019
+#### *Exemplo: baixando os dados do 4º trimestre de 2019*
 Para utilizar os dados da __PnadC trimestral do 4º trimestre de 2019__, é necessário:
 
 1. Baixar o arquivo "PNADC_042019.zip", na pasta: <ftp://ftp.ibge.gov.br/Trabalho_e_Rendimento/Pesquisa_Nacional_por_Amostra_de_Domicilios_continua/Trimestral/Microdados/2019/>.
@@ -35,8 +43,8 @@ Para utilizar os dados da __PnadC trimestral do 4º trimestre de 2019__, é nece
 2. Baixar o arquivo "Dicionario_e_input.zip", na pasta: <ftp://ftp.ibge.gov.br/Trabalho_e_Rendimento/Pesquisa_Nacional_por_Amostra_de_Domicilios_continua/Trimestral/Microdados/Documentacao/>.
 
 3. A seguir, é preciso descompactar os dois arquivos. Para utilizar o comando PnadcTidy, serão necessários os seguintes arquivos descompactados:
-- "Input_PNADC_trimestral.txt" e,
-- "PNADC_042019.txt".
+        + "Input_PNADC_trimestral.txt" e,
+        + "PNADC_042019.txt".
 
 
 
@@ -54,9 +62,7 @@ rm(list=ls())   # Limpa objetos no Environment
 cat("\014")     # Limpa o console
 
 
-# O comando abaixo mostra qual é a pasta de trabalho do R.
-# Ou seja, em qual pasta o R vai ler e salvar os arquivos
-
+# O comando abaixo mostra qual é a pasta de trabalho do R.Ou seja, em qual pasta o R vai ler e salvar os arquivos
 getwd()
 
 
@@ -70,27 +76,26 @@ setwd("C:/Users/gustavo/Desktop/curso R para jornalistas/uDados/")
 
 `"/"`
 
-- *Exceção: sistema iOS*.
+*Exceção: sistema iOS*.
 
 
 
-## 3. Instalando e carregando os pacotes necessários
+## 3. Instalando e carregando pacotes
 
 
 Para usar o comando `PnadTidy` e manipular os dados da PnadC, vamos usar algumas funções que fazem parte de pacotes que não vêm com o R básico.
 
 Pacotes são 
 
-> "conjuntos de extras de funções que podem ser instalados além do R base" (IBDAP, p. 15).
+> "conjuntos extras de funções que podem ser instalados além do R base" (IBDAP, p. 15).
 
 
-Para instalar os pacotes que precisamos, basta executar os comandos abaixo:
-
-
+Para instalar um pacote, basta executar o comando abaixo:
 `install.packages("nome do pacote")`
 
 
-Vamos instalar um conjunto de pacotes:
+
+Vamos instalar apenas os pacotes que iremos utilizar:
 
 
 
@@ -109,7 +114,8 @@ Vamos instalar um conjunto de pacotes:
 
 
 
-Depois de instalados, os pacotes ficam disponíveis na biblioteca para serem usados e não precisam ser instalados novamente em cada uso. No entanto, é preciso carregar os pacotes que serão utilizados toda vez que um novo código for escrito.  
+Depois de instalados, os pacotes ficam disponíveis na biblioteca para serem usados e não precisam ser instalados novamente em cada uso. No entanto, é preciso carregar os pacotes que serão utilizados toda vez que um novo código for escrito.
+O comando `library` carrega os pacotes:
 
 ```{r, echo=T,  message=FALSE}
 
@@ -126,13 +132,13 @@ library(devtools) # pacote utilizado para baixar o PnadcTidy
 
 
 
-## 4. Instalabdo o `PnadcTidy`
+## 4. Instalando o `PnadcTidy`
 
 
 O pacote `PnadcTidy` está em um repositório do Github. Para instalá-lo e carregá-lo, execute as linhas de comando abaixo:
 
 
-```{r, echo=T, message=FALSE, warning=FALSE}
+```{r, echo=T, message=FALSE}
 
 devtools::install_github("gustavoppmonteiro/PnadcTidy")
 library(PnadcTidy)
@@ -149,12 +155,12 @@ library(PnadcTidy)
 ## 5. Lendo a Pnad com o `PnadcTidy`
 
 
-O comando `PnadcTidy` é composto por três argumentos, tendo a seguinte forma:
+O comando `PnadcTidy` é composto por três argumentos:
 
-`PnadcTidy(inputSAS, arquivoPnad, variaveis)`
+`PnadcTidy(inputSAS, arquivoPnad, variaveis)`, 
 
 
-Os argumentos são:
+Para funcionar corretamente, é necessário especificar os três argumentos:
 
 
 * *inputSAS*: usado para especificar o nome do arquivo Input do SAS (deve terminar em ".txt").
@@ -168,10 +174,10 @@ Os argumentos são:
 
 ***
 
-### Exemplo: lendo os dados do 4º trimestre de 2019
+#### Exemplo: lendo os dados do 4º trimestre de 2019
 
 
-Neste exemplo, vamos ler os dados salvos na pasta de trabalho do R, referentes à Pnad trimestral do **4º trimestre de 2019**. Vamos guardar esses dados em um objeto chamado "Pnad4T2019".
+Neste exemplo, vamos ler os dados salvos na pasta de trabalho do R, referentes à Pnad trimestral do *4º trimestre de 2019*. Vamos guardar esses dados em um objeto chamado "Pnad4T2019".
 
 
 Além disso, vamos manter apenas algumas variáveis do banco, com o objetivo de poupar espaço na memória e reduzir o tempo de processamento.
@@ -216,6 +222,9 @@ dim(Pnad4T2019) # vê as dimensões do banco estruturado
 
 
 Os dados da Pnad estão prontos para serem manuseados, em um banco de dados estruturado.
+
+
+**Fim**
 
 
 ***
