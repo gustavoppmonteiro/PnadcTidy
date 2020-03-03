@@ -431,6 +431,9 @@ Note que, para o 4º trimestre de 2019, a estimativa era de que havia 12.347.245
 *Obs.: Bateu com o Sidra: <https://sidra.ibge.gov.br/tabela/4093#resultado>*
 
 
+***
+
+
 ##### Exemplo 2: renda média por sexo no estado de São Paulo
 
 
