@@ -182,7 +182,16 @@ Para funcionar corretamente, é necessário especificar os três argumentos:
 
 * *variaveis*: usado para selecionar as variáveis da PnadC que serão mantidas na base.
         
-       
+
+
+Em caso de dúvidas, é possível obter ajuda executando a linha de comando abaixo. A ajuda aparece na janela "Help" ao lado.
+
+
+```{r, echo=T, message=FALSE, warning=FALSE}
+
+?PnadcTidy
+
+```
 
 
 ***
@@ -533,11 +542,23 @@ Exemplo de tabela usando os dois trimestres salvos:
 
 ``` {r, echo=T, message=F, warning = F}
 
-# Número de mulheres ocupadas em 4t de 2018 e 2019 em SP
-mOcupadas <- pnadSP %>% 
-        filter(V2007==2 & VD4002 == 1)    # filtra mulheres ocupadas
+# Número de ocupad0s em 4t de 2018 e 2019 em SP, por sexo
+ocupados <- pnadSP %>% 
+        filter(VD4002 == 1)    # filtra ocupados
 
-tabela <- wtd.table(mOcupadas$V2007, mOcupadas$Ano, w = mOcupadas$V1028)
+
+# cria variável com rótulo de sexo
+ocupados <- ocupados %>% 
+        mutate(sexo=NA)
+
+ocupados$sexo[ocupados$V2007 == 1] = "Homem"
+ocupados$sexo[ocupados$V2007 == 2] = "Mulher"
+
+ocupados <- ocupados %>% 
+        select(-V2007)
+
+# gera a tabela
+tabela <- wtd.table(ocupados$sexo, ocupados$Ano, w = ocupados$V1028)
 tabela
 
 
@@ -552,6 +573,6 @@ Entre o 4º trimestre de 2018 e o 4º trimestre de 2019 o número de mulheres oc
 
 ***
 
-### FIM
+### ...
 
 ***
