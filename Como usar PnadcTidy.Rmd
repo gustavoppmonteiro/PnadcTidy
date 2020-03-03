@@ -20,6 +20,14 @@ knitr::opts_knit$set(root.dir = "C:/Users/gustavo/Desktop/curso R para jornalist
 4. Instalando o `PnadcTidy`
 5. Lendo a Pnad com o `PnadcTidy`
 
+
+6. Extraindo informações e tabelas
+        + criando rótulos
+        + extraindo informações/tabelas sem desenho amostral
+        + extraindo informações/tabelas com desenho amostral
+        + juntando bancos
+        
+        
 ***
 
 
@@ -43,8 +51,8 @@ Para utilizar os dados da __PnadC trimestral do 4º trimestre de 2019__, é nece
 2. Baixar o arquivo "Dicionario_e_input.zip", na pasta: <ftp://ftp.ibge.gov.br/Trabalho_e_Rendimento/Pesquisa_Nacional_por_Amostra_de_Domicilios_continua/Trimestral/Microdados/Documentacao/>.
 
 3. A seguir, é preciso descompactar os dois arquivos. Para utilizar o comando PnadcTidy, serão necessários os seguintes arquivos descompactados:
-        + "Input_PNADC_trimestral.txt" e,
-        + "PNADC_042019.txt".
+* "Input_PNADC_trimestral.txt" e,
+* "PNADC_042019.txt".
 
 
 
@@ -77,6 +85,9 @@ setwd("C:/Users/gustavo/Desktop/curso R para jornalistas/uDados/")
 `"/"`
 
 *Exceção: sistema iOS*.
+
+
+***
 
 
 
@@ -129,7 +140,7 @@ library(devtools) # pacote utilizado para baixar o PnadcTidy
 ```
 
 
-
+***
 
 
 ## 4. Instalando o `PnadcTidy`
@@ -150,6 +161,7 @@ library(PnadcTidy)
 **É importante lembrar que, na hora da instalação, o nome do pacote deve aparecer entre aspas.** Mas isso não é necessário ao executar o comando library, que carrega o pacote.
 
 
+***
 
 
 ## 5. Lendo a Pnad com o `PnadcTidy`
@@ -223,8 +235,206 @@ dim(Pnad4T2019) # vê as dimensões do banco estruturado
 
 Os dados da Pnad estão prontos para serem manuseados, em um banco de dados estruturado.
 
-
-**Fim**
+Abaixo seguem alguns exemplos de informações e tabelas que podem ser extraídas do banco resultante.
 
 
 ***
+
+### 6. Extraindo informações e tabelas
+#### a. Criando categorias
+
+Uma forma de criar categorias é por criar uma nova variável, usando `mutate`, e daí alterar seus valores de acordo com as categorias desejadas.
+
+Por exemplo, vamos utilizar a variável de idade (V2009) para criar uma variável de faixa etária (fxEtaria) com as seguintes categorias:
+* Menos de 14 anos
+* De 14 a 17 anos
+* De 18 a 24 anos
+* De 24 a 29 anos
+* 30 anos ou mais
+
+
+``` {r, echo=T, message=F}
+
+Pnad4T2019 <- Pnad4T2019 %>% 
+        mutate(fxEtaria=NA)      # cria a variável fxEtaria, com todos os valores igual a missing
+
+
+# Abaixo, as categorias são separadas:
+Pnad4T2019$fxEtaria[Pnad4T2019$V2009 < 14] = "Menos de 14"
+Pnad4T2019$fxEtaria[Pnad4T2019$V2009 >= 14 & Pnad4T2019$V2009 <=17] = "14 a 17 anos"
+Pnad4T2019$fxEtaria[Pnad4T2019$V2009 >= 18 & Pnad4T2019$V2009 <=24] = "18 a 24 anos"
+Pnad4T2019$fxEtaria[Pnad4T2019$V2009 >= 25 & Pnad4T2019$V2009 <=29] = "25 a 29 anos"
+Pnad4T2019$fxEtaria[Pnad4T2019$V2009 >= 30] = "30 anos ou +"
+
+head(Pnad4T2019)
+
+```
+
+
+
+A categorização também serve para criar rótulos. No exemplo abaixo, criamos um rótulo para a variável de sexo (V2007), em uma nova variável (sexo).
+
+
+
+``` {r, echo=T, message=F}
+
+Pnad4T2019 <- Pnad4T2019 %>% 
+        mutate(sexo=NA)         # cria variável sexo, com todos os valores missing
+
+
+Pnad4T2019$sexo[Pnad4T2019$V2007 == 1] = "Homem"        # cria rótulos para os valores da variável V2007
+Pnad4T2019$sexo[Pnad4T2019$V2007 == 2] = "Mulher"
+
+Pnad4T2019 <- Pnad4T2019 %>% 
+        select(-V2007)          # joga fora a variável V2007
+
+```
+
+
+***
+
+
+#### b. Fazendo tabelas sem usar o desenho amostral
+
+
+O jeito mais fácil de processar tabelas da PnadC é utilizando o pacote `questionr`.
+Primeiro é preciso baixá-lo e carregá-lo, usando os comandos abaixo:
+
+
+`install.packages("questionr")`
+`library(questionr)`
+
+
+
+***
+
+##### Exemplo 1: Rendimento médio das mulheres no Estado de SP
+
+
+``` {r, echo=T, message=F}
+
+Pnad4T2019SP <- Pnad4T2019 %>% 
+        filter(sexo=="Mulher" & V2009 >= 14 & VD4002 ==1 & UF==35)     # filtra mulheres, com 14 anos ou + e de SP
+tabela1 <- wtd.mean(Pnad4T2019SP$VD4016, w = Pnad4T2019SP$V1028)
+tabela1
+
+```
+
+*Obs.: O resultado bateu com o do SIDRA: https://sidra.ibge.gov.br/tabela/5429#resultado*
+
+
+***
+
+
+##### Exemplo 2: Quantidade de ocupados segundo sexo 
+
+
+``` {r, echo=T, message=F}
+
+tabela2 <- wtd.table(Pnad4T2019$sexo, Pnad4T2019$VD4002, w = Pnad4T2019$V1028)
+tabela2
+
+
+```
+
+*Bateu com Sidra: https://sidra.ibge.gov.br/tabela/4093#resultado*
+
+
+***
+
+
+#### c. Exportando tabelas
+
+Agora vamos exportar os dados da tabela para uma planilha de excel.
+
+
+``` {r, echo=T, message=F}
+
+write.csv2(tabela1, "arquivo.csv")      # grava a tabela1 (na pasta de trabalho)
+
+```
+
+
+
+***
+
+***
+
+
+
+
+#############################
+###  COM DESENHO AMOSTRAL ###
+#############################
+
+library("survey")
+library(PNADcIBGE)
+
+# configura desenho amostral (pacote douglas)
+dadosDesenho <- pnadc_design(pnadinha)
+
+
+# 1. renda media por sexo - SP
+# Bateu com o SIDRA: https://sidra.ibge.gov.br/tabela/5429#resultado
+pnadinha <- pnadinha %>% 
+        mutate(filtro = ifelse( (V2009 >= 14 & VD4016 > 0 & UF==35), 1, 0))
+
+mediarendaSexo <- svyby(~VD4016, ~Sexo, subset(dadosDesenho, pnadinha$filtro == 1), svymean,  na.rm = T)
+mediarendaSexo
+cv(mediarendaSexo)
+
+
+
+# 2. qde de ocupados por sexo - SP
+# Bateu com o Sidra: https://sidra.ibge.gov.br/tabela/4093#resultado
+pnadinha <- pnadinha %>% 
+        mutate(filtro2 = ifelse( (V2009 >= 14 & VD4002 ==1 & UF==35), 1, 0))
+
+totalsexo <- svytotal(~Sexo, subset(dadosDesenho, pnadinha$filtro2 == 1), na.rm=T)
+totalsexo
+cv(totalsexo)
+
+
+
+
+
+# JUNTANDO DOIS TRIMESTRES
+
+library(PnadcTidy)
+
+
+pnadinha2 <- PnadcTidy(inputSAS="Input_PNADC_trimestral.txt", 
+                      arquivoPnad="PNADC_042018_20190729.txt", 
+                      variaveis=c("VD4009", "V2009", "V2007" ,"UF", "VD4016", "VD4002", "Ano"))
+
+
+
+# cria rotulo de sexo
+pnadinha2 <- pnadinha2 %>% 
+        mutate(Sexo = ifelse(V2007 == 1, "Homem", "Mulher")) %>% 
+        select(-V2007)
+
+pnadinha2 <- pnadinha2 %>% 
+        mutate(filtro2 = ifelse( (V2009 >= 14 & VD4002 ==1 & UF==35), 1, 0))
+
+pnadinhaSP <- pnadinha %>% 
+        filter(UF==35)
+
+pnadinha2SP <- pnadinha2 %>% 
+        filter(UF==35)
+
+rm(pnadinha, pnadinha2)
+
+SP4t18e19 <- bind_rows(pnadinhaSP, pnadinha2SP)
+
+
+# 1. Mulheres ocupadas em 4t de 2018 e 2019 em SP
+# Bateu com o SIDRA: hhttps://sidra.ibge.gov.br/tabela/4093#resultado
+bco <- SP4t18e19 %>% 
+        filter(Sexo=="Mulher" & V2009 >= 14 & VD4002 ==1)
+tabela <- wtd.table(bco$Sexo, bco$Ano, w = bco$V1028)
+tabela
+
+
+
+
