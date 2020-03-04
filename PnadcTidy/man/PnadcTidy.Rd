@@ -2,13 +2,11 @@
 \alias{PnadcTidy}
 %- Also NEED an '\alias' for EACH other topic documented here.
 \title{
-Transforma microdados baixados da PnadC em um tidy dataset.
+Transforma microdados baixados da PnadC em uma base de dados estruturados (tidy dataset).
 
 }
 \description{
-O pacote PnadcTidy transforma microdados baixados da PnadC em um tidy dataset, isto é, um banco relacional do tipo definido por Wickham (2014).
-
-
+A função PnadcTidy transforma microdados baixados da PnadC em uma base de dados estruturados (tidy dataset), do tipo definido por Wickham (2014).
 
 
 Para usá-lo é preciso antes baixar os microdados e também o arquivo de Input para o SAS, disponíveis em:
@@ -36,26 +34,22 @@ usado para selecionar as variáveis da PnadC que serão mantidas na base.
 }
 
 \details{
-O pacote PnadcTidy permite que os microdados da PNAD Contínua sejam transformados em um banco de dados relacional do tipo tidy dataset.
+O pacote PnadcTidy permite que os microdados da PNAD Contínua sejam transformados em uma base de dados estruturados (tidy dataset).
 
 
 
-
-Ele é baseado no pacote "PNADcIBGE"", de Douglas Braga. Inclusive, utiliza parte da programação desse pacote para a extração de informações do arquivo de input do SAS, na função inputPnadC.
+A função inputPnadC dele é inspirada no pacote "PNADcIBGE", de Douglas Braga.
 
 
 Diferentemente do PNADcIBGE, o PnadcTidy retorna um banco relacional, que é mais fácil de ser manuseado utilizando, por exemplo, os pacotes dplyr e ggplot2 - ambos incluídos no pacote tidyverse.
 Embora isso signifique que este banco não contenha a declaração do desenho amostral, isso também representa uma vantagem para aquelas pessoas com menos familiaridade com os conceitos relacionados ao desenho amostral, como Coeficiente de Variação.
 
 
-A desvantagem é que o banco de dados resultante exige que sempre se declare a variável de peso amostral (V1028, para as pesquisas trimestrais ou V1032 para as pesquisas anuais).
-
+A desvantagem é que, na hora de extrair informações desse banco relacional, é necessário declarar a variável de peso amostral (V1028, para as pesquisas trimestrais ou V1032 para as pesquisas anuais).
 
 
 
 Por exemplo, após rodar o comando PnadcTidy para os microdados de determinado trimestre, e salvar o banco com o nome PNAD1, se alguém quiser obter a frequência de pessoas segundo Sexo (V2007) e Condição na ocupação (V4002), terá que instalar o pacote questionr e, em seguida, rodar as seguintes linhas de comando:
-
-
 
 
 tabela <- wtd.table(PNAD1$V2007, PNAD1$VD4002, weights = PNAD1$V1028)
@@ -64,13 +58,12 @@ tabela
 
 
 
-
-Observe que é o comando especifica o peso amostral utilizando o parâmetro "weights".
+Observe que no comando acima o peso amostral é especificado utilizando o parâmetro "weights".
 
 
 }
 \value{
-Retorna uma base de dados arrumada (tidy dataset) que contém apenas as variáveis selecionadas e as variáveis de peso e do desenho amostral.
+Retorna uma base de dados estruturados (tidy dataset) que contém apenas as variáveis selecionadas e as variáveis de peso e do desenho amostral.
 }
 \references{
 Wickham, H. (2014). Tidy data. Journal of Statistical Software, 59(10):1–23. Disponível em: <https://www.jstatsoft.org/article/view/v059i10>.
